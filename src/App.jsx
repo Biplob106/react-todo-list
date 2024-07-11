@@ -1,10 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { AiOutlineDelete } from "react-icons/ai";
 import {BsCheckLg} from 'react-icons/bs';
 
 function App() {
   const [iscompleteScreen, setIscompleteScreen] = useState(false);
+  const [allTodos, setAllTodos] = useState([]);
+  const [newTitle , setNewTitle] = useState("");
+  const [newDescription , setNewDescription] = useState("");
+
+  const handleAddTodo = () => {
+    let newTodoItem = {
+      title: newTitle,
+      description: newDescription,
+
+    }
+    let updatedTodoArr = [...allTodos];
+
+    updatedTodoArr.push(newTodoItem);
+    setAllTodos(updatedTodoArr);
+    localStorage.setItem("todolist", JSON.stringify(updatedTodoArr));
+  }
+useEffect(() => {
+let savedTodo = JSON.parse(localStorage.getItem("todolist")) ;
+if(savedTodo){
+  setAllTodos(savedTodo);
+}
+}, [])
   return (
     <div className="App">
       <h1>Todo List</h1>
@@ -12,14 +34,14 @@ function App() {
         <div className="todo-input">
           <div className="todo-input-item">
             <label > Title</label>
-            <input type="text" placeholder="Ada title" />
+            <input type="text" placeholder="Ada title" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
           </div>
           <div className="todo-input-item">
             <label > description</label>
-            <input type="text" placeholder="Add description" />
+            <input type="text" placeholder="Add description" value={newDescription} onChange={(e) => setNewDescription(e.target.value)} />
           </div>
           <div className="todo-input-item">
-            <button type="button" className="primary-btn">Add</button>
+            <button type="button" className="primary-btn" onClick={handleAddTodo}>Add</button>
           </div>
         </div>
         <div className="btn-area">
@@ -27,17 +49,21 @@ function App() {
           <button className={`scendary-btn ${iscompleteScreen===true && 'active'}`} onClick={() => setIscompleteScreen(true)}>Complete</button>
         </div>
         <div className="todo-list">
-          <div className="todo-list-item">
+          {allTodos.map((item, index) => {
+            return (
+              <div className="todo-list-item" key={index}>
             <div>
-            <h3>Task-1</h3>
-            <p>Task-1 Description</p>
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
             </div>
             <div>
               <AiOutlineDelete className="icon" />
               <BsCheckLg  className="check-icon"/>
             </div>
           </div>
+            )
 
+          })}
         </div>
       </div>
     </div>
